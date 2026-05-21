@@ -42,7 +42,12 @@ const loginUser = async (req, res) => {
       { expiresIn: "60m" }
     );
 
-    res.cookie("token", token, { httpOnly: true, secure: false }).json({
+    // ✅ Fix - secure must be true in production (HTTPS)
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+}).json({
       success: true,
       message: "Logged in successfully",
       user: { email: checkUser.email, role: checkUser.role, id: checkUser._id, userName: checkUser.userName },
